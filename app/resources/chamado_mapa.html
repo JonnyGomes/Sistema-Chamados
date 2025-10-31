@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mapa de Chamados</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        #mapid {
+            width: 100%;
+            height: 600px;
+            border-radius: 12px;
+        }
+        .leaflet-popup-content {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="mapid"></div>
+
+    <script>
+        const markers = {markers_json};
+
+        if (markers && markers.length > 0) {
+            const map = L.map('mapid').setView([markers[0].lat, markers[0].lng], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            markers.forEach(ch => {
+                const popup = `<b>${ch.titulo}</b><br>${ch.descricao}<br><small>Status: ${ch.status}</small>`;
+                L.marker([ch.lat, ch.lng]).addTo(map).bindPopup(popup);
+            });
+        } else {
+            const map = L.map('mapid').setView([-15.7801, -47.9292], 4);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+            L.popup()
+                .setLatLng([-15.78, -47.92])
+                .setContent("Nenhum chamado externo aberto com coordenadas.")
+                .openOn(map);
+        }
+    </script>
+</body>
+</html>
