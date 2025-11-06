@@ -120,10 +120,13 @@ vim app/config/permission.php
 
 ## 📝 Licença
 
-Copyright (c) 2006-2024, Adianti Solutions Ltd.
-Todos os direitos reservados.
+Copyright (c) 2025 Sistema de Chamados
 
-O software é fornecido sob licença Adianti Framework conforme especificado nos arquivos de licença inclusos.
+Este software é um produto proprietário e confidencial. O código fonte deste programa não é software livre ou de código aberto e não pode ser compartilhado ou usado sem autorização expressa dos detentores dos direitos autorais.
+
+Todos os direitos reservados. Nenhuma parte deste software pode ser reproduzida, distribuída ou transmitida em qualquer forma ou por qualquer meio, incluindo fotocópia, gravação ou outros métodos eletrônicos ou mecânicos, sem a permissão prévia por escrito dos detentores dos direitos autorais, exceto no caso de breves citações incorporadas em análises críticas e outros usos não comerciais permitidos pela lei de direitos autorais.
+
+Para solicitar permissões, entre em contato com: gomesjonny224@gmail.com
 
 ## ✒️ Autores
 
