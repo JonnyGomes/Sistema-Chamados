@@ -1,14 +1,13 @@
 # Sistema de Gestão de Chamados
 
 ## 📞 Sobre o Projeto
-Sistema web especializado para gestão de chamados técnicos, permitindo o registro, acompanhamento e controle de solicitações internas e externas com geolocalização.
+Sistema web especializado para gestão de chamados técnicos, permitindo o registro, acompanhamento e controle de solicitações internas e externas.
 
 ## ⚡ Problemas que Resolvemos
 
 ### Desafios no Gerenciamento de Chamados
 - Dificuldade no controle e acompanhamento de solicitações
 - Falta de rastreabilidade dos atendimentos
-- Problemas na localização de chamados externos
 - Ausência de histórico centralizado
 - Comunicação ineficiente entre solicitantes e atendentes
 
@@ -19,20 +18,16 @@ Sistema web especializado para gestão de chamados técnicos, permitindo o regis
 - Controle de status do atendimento
 - Geolocalização de chamados externos
 - Histórico de atendimentos
-- Sistema de notificações
 
 #### 2. Controle de Atendimento
 - Atribuição de responsáveis
 - Acompanhamento de status
 - Registro de observações
-- Priorização de chamados
 - Métricas de atendimento
 
 #### 3. Monitoramento
-- Mapa de chamados externos
 - Dashboard administrativo
 - Relatórios gerenciais
-- Indicadores de performance
 - Histórico de interações
 
 #### 4. Gestão de Usuários
@@ -57,7 +52,6 @@ Sistema web especializado para gestão de chamados técnicos, permitindo o regis
 - Sistema de geolocalização
 - Dashboard interativo
 - Gestão de usuários
-- Sistema de notificações
 - Geração de relatórios
 
 ### Requisitos Não Funcionais
