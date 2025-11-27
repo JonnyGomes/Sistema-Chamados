@@ -1,8 +1,8 @@
 <?php
 /**
  * PontoForm
- * Registro de ponto (1 registro por dia) com geolocalização e timeline
- * Autor: Jonny (adaptado)
+ * Registro de ponto (até 4 registros por dia) com geolocalização e timeline
+ * Estrutura: entrada, saida (meio dia), entrada_2 (tarde), saida_1 (final)
  */
 class PontoForm extends TPage
 {
@@ -114,9 +114,11 @@ class PontoForm extends TPage
             // Busca registro do dia (uma linha por dia)
             $criteria = new TCriteria;
             $criteria->add(new TFilter('usuario_id', '=', $user));
-            // verifica data em data_hora_entrada ou data_hora_saida (qualquer um marcado hoje)
+            // verifica data em qualquer campo de data
             $criteria->add(new TFilter('DATE(data_hora_entrada)', '=', date('Y-m-d')), TExpression::OR_OPERATOR);
             $criteria->add(new TFilter('DATE(data_hora_saida)', '=', date('Y-m-d')), TExpression::OR_OPERATOR);
+            $criteria->add(new TFilter('DATE(data_hora_saida_1)', '=', date('Y-m-d')), TExpression::OR_OPERATOR);
+            $criteria->add(new TFilter('DATE(data_hora_entrada_2)', '=', date('Y-m-d')), TExpression::OR_OPERATOR);
             $criteria->setProperty('order', 'id desc');
             $criteria->setProperty('limit', 1);
 
@@ -135,20 +137,36 @@ class PontoForm extends TPage
                 // vertical line
                 $html .= "<div style='position:absolute; left:30px; top:0; bottom:0; width:4px; background:#e9ecef; border-radius:4px;'></div>";
 
-                // Entrada
+                // Entrada (manhã)
                 if (!empty($p->data_hora_entrada)) {
                     $dtEntrada = (new DateTime($p->data_hora_entrada))->format('H:i:s');
-                    $html .= $this->timelineItem('Entrada', $dtEntrada, 'green', -60);
+                    $html .= $this->timelineItem('Entrada', $dtEntrada, 'green', -60, 'fa-sign-in-alt');
                 } else {
-                    $html .= $this->timelineItem('Entrada', '--:--:--', 'gray', -60);
+                    $html .= $this->timelineItem('Entrada', '--:--:--', 'gray', -60, 'fa-sign-in-alt');
                 }
 
-                // Saída
+                // Saída (meio dia)
                 if (!empty($p->data_hora_saida)) {
-                    $dtSaida = (new DateTime($p->data_hora_saida))->format('H:i:s');
-                    $html .= $this->timelineItem('Saída', $dtSaida, 'red', 40);
+                    $dtSaidaMeioDia = (new DateTime($p->data_hora_saida))->format('H:i:s');
+                    $html .= $this->timelineItem('Saída a Tarde', $dtSaidaMeioDia, 'orange', -20, 'fa-utensils');
                 } else {
-                    $html .= $this->timelineItem('Saída', '--:--:--', 'gray', 40);
+                    $html .= $this->timelineItem('Saída a Tarde', '--:--:--', 'gray', -20, 'fa-utensils');
+                }
+
+                // Entrada (tarde)
+                if (!empty($p->data_hora_entrada_2)) {
+                    $dtEntradaTarde = (new DateTime($p->data_hora_entrada_2))->format('H:i:s');
+                    $html .= $this->timelineItem('Entrada a Tarde', $dtEntradaTarde, 'blue', 20, 'fa-sign-in-alt');
+                } else {
+                    $html .= $this->timelineItem('Entrada a Tarde', '--:--:--', 'gray', 20, 'fa-sign-in-alt');
+                }
+
+                // Saída (final)
+                if (!empty($p->data_hora_saida_1)) {
+                    $dtSaidaFinal = (new DateTime($p->data_hora_saida_1))->format('H:i:s');
+                    $html .= $this->timelineItem('Saída Final', $dtSaidaFinal, 'red', 60, 'fa-sign-out-alt');
+                } else {
+                    $html .= $this->timelineItem('Saída Final', '--:--:--', 'gray', 60, 'fa-sign-out-alt');
                 }
 
                 $html .= "</div>"; // relative
@@ -171,10 +189,16 @@ class PontoForm extends TPage
     /**
      * Helper para montar um item da timeline
      */
-    private function timelineItem($title, $time, $color='green', $offset=0)
+    private function timelineItem($title, $time, $color='green', $offset=0, $icon='fa-circle')
     {
-        $icon = ($color == 'green') ? 'fa-sign-in-alt' : (($color == 'red') ? 'fa-sign-out-alt' : 'fa-circle');
-        $bg = ($color == 'green') ? '#28a745' : (($color == 'red') ? '#dc3545' : '#6c757d');
+        $bg = '';
+        switch($color) {
+            case 'green': $bg = '#28a745'; break;
+            case 'orange': $bg = '#fd7e14'; break;
+            case 'blue': $bg = '#007bff'; break;
+            case 'red': $bg = '#dc3545'; break;
+            default: $bg = '#6c757d'; break;
+        }
 
         $item  = "<div style='margin:32px 0; position:relative;'>";
         $item .= "<div style='position:absolute; left:0; top:0; width:60px; text-align:center;'>";
@@ -186,6 +210,34 @@ class PontoForm extends TPage
         $item .= "</div></div>";
 
         return $item;
+    }
+
+    /**
+     * Determina qual tipo de registro deve ser feito baseado no estado atual
+     */
+    private function determinarProximoRegistro($pontoExistente)
+    {
+        // Se não existe registro do dia, começa com entrada
+        if (!$pontoExistente) {
+            return 'entrada';
+        }
+        
+        // Verifica qual é o próximo registro necessário em sequência
+        if (empty($pontoExistente->data_hora_entrada)) {
+            return 'entrada';
+        }
+        elseif (empty($pontoExistente->data_hora_saida)) {
+            return 'saida';
+        }
+        elseif (empty($pontoExistente->data_hora_entrada_2)) {
+            return 'entrada';
+        }
+        elseif (empty($pontoExistente->data_hora_saida_1)) {
+            return 'saida';
+        }
+        else {
+            throw new Exception('Todos os pontos do dia já foram registrados.');
+        }
     }
 
     /**
@@ -210,24 +262,15 @@ class PontoForm extends TPage
 
             // hora atual do servidor
             $now = new DateTime('now');
-            $hora = (int) $now->format('H');
             $timeFull = $now->format('Y-m-d H:i:s');
-
-            // determina tipo conforme faixa horária
-            $tipoAtual = null;
-            if ($hora >= 5 && $hora <= 11) {
-                $tipoAtual = 'entrada';
-            } elseif ($hora >= 12 && $hora <= 18) {
-                $tipoAtual = 'saida';
-            } else {
-                throw new Exception('Fora do horário permitido para registrar ponto (05:00–18:00).');
-            }
 
             // busca registro do usuário para HOJE (uma linha por dia)
             $criteria = new TCriteria;
             $criteria->add(new TFilter('usuario_id', '=', $user));
             $criteria->add(new TFilter('DATE(data_hora_entrada)', '=', date('Y-m-d')), TExpression::OR_OPERATOR);
             $criteria->add(new TFilter('DATE(data_hora_saida)', '=', date('Y-m-d')), TExpression::OR_OPERATOR);
+            $criteria->add(new TFilter('DATE(data_hora_saida_1)', '=', date('Y-m-d')), TExpression::OR_OPERATOR);
+            $criteria->add(new TFilter('DATE(data_hora_entrada_2)', '=', date('Y-m-d')), TExpression::OR_OPERATOR);
             $criteria->setProperty('order', 'id desc');
             $criteria->setProperty('limit', 1);
 
@@ -235,64 +278,56 @@ class PontoForm extends TPage
             $pontos = $repo->load($criteria, FALSE);
             $ponto = ($pontos && count($pontos)>0) ? $pontos[0] : null;
 
-            // regra: se não existe registro hoje e tipo atual é 'saida' -> bloquear (exigir entrada primeiro)
-            if (!$ponto && $tipoAtual == 'saida') {
-                throw new Exception('Não é possível registrar saída sem ter registrado a entrada hoje.');
-            }
-
-            // regra: impedir tipo duplicado consecutivo
-            if ($ponto) {
-                // determina último tipo registrado
-                $ultimoTipo = null;
-                if (!empty($ponto->data_hora_saida)) $ultimoTipo = 'saida';
-                elseif (!empty($ponto->data_hora_entrada)) $ultimoTipo = 'entrada';
-
-                if ($ultimoTipo == $tipoAtual) {
-                    throw new Exception("Você já registrou um ponto de tipo '{$tipoAtual}' por último. Aguarde o próximo registro de outro tipo.");
-                }
-            }
+            // Determina qual é o próximo registro a ser feito
+            $proximoRegistro = $this->determinarProximoRegistro($ponto);
 
             // grava/atualiza
             if (!$ponto) {
-                // cria novo registro do dia com entrada preenchida
+                // cria novo registro do dia
                 $pontoObj = new Ponto;
                 $pontoObj->usuario_id = $user;
-                if ($tipoAtual == 'entrada') {
-                    $pontoObj->data_hora_entrada = $timeFull;
-                } else { // não deve ocorrer pq bloqueamos saida sem entrada
-                    $pontoObj->data_hora_saida = $timeFull;
-                }
+                
+                // Sempre começa com entrada
+                $pontoObj->data_hora_entrada = $timeFull;
+                $pontoObj->tipo = 'entrada';
+                
                 $pontoObj->latitude = $lat;
                 $pontoObj->longitude = $lng;
-                // para histórico simples, podemos guardar o tipo último
-                $pontoObj->tipo = $tipoAtual;
                 $pontoObj->store();
             } else {
-                // atualiza registro do dia: se for saída e ainda não tem saída -> seta saída
-                if ($tipoAtual == 'saida') {
-                    $ponto->data_hora_saida = $timeFull;
-                    $ponto->longitude = $lng;
-                    $ponto->latitude = $lat;
-                    $ponto->tipo = $tipoAtual;
-                    $ponto->store();
-                } else {
-                  
+                // atualiza registro existente
+                if ($proximoRegistro == 'entrada') {
                     if (empty($ponto->data_hora_entrada)) {
                         $ponto->data_hora_entrada = $timeFull;
-                        $ponto->latitude = $lat;
-                        $ponto->longitude = $lng;
-                        $ponto->tipo = $tipoAtual;
-                        $ponto->store();
-                    } else {
-                        throw new Exception('Registro de entrada já existe para hoje.');
+                        $ponto->tipo = 'entrada';
+                    } else if (empty($ponto->data_hora_entrada_2)) {
+                        $ponto->data_hora_entrada_2 = $timeFull;
+                        $ponto->tipo = 'entrada';
+                    }
+                } else if ($proximoRegistro == 'saida') {
+                    if (empty($ponto->data_hora_saida)) {
+                        $ponto->data_hora_saida = $timeFull;
+                        $ponto->tipo = 'saida';
+                    } else if (empty($ponto->data_hora_saida_1)) {
+                        $ponto->data_hora_saida_1 = $timeFull;
+                        $ponto->tipo = 'saida';
                     }
                 }
+                
+                $ponto->latitude = $lat;
+                $ponto->longitude = $lng;
+                $ponto->store();
             }
 
             TTransaction::close();
 
             // recarrega timeline e exibe mensagem
-            new TMessage('info', 'Ponto registrado com sucesso!');
+            $mensagens = [
+                'entrada' => 'Ponto de entrada registrado com sucesso!',
+                'saida' => 'Ponto de saída registrado com sucesso!'
+            ];
+            
+            new TMessage('info', $mensagens[$proximoRegistro]);
             $this->onReload();
 
         } catch (Exception $e) {

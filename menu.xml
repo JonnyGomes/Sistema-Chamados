@@ -18,7 +18,7 @@
                   <icon>fas:university fa-fw</icon>
                   <action>SystemUnitList</action>
               </menuitem>
-              <menuitem label='_t{Roles}'>
+              <menuitem label='Perfis de Acesso'>
                   <icon>fas:user-tag fa-fw</icon>
                   <action>SystemRoleList</action>
               </menuitem>
@@ -70,7 +70,7 @@
               </menuitem>
               <menuitem label='_t{Schedules}'>
                   <icon>fas:clock fa-fw</icon>
-                  <action>SystemScheduleLogList</action>
+                 <!-- <action>SystemScheduleLogList</action> -->
               </menuitem>
               <menuitem label='_t{PHP Log}'>
                   <icon>fas:exclamation-triangle fa-fw</icon>
@@ -90,14 +90,10 @@
                 <icon>fas:list</icon>
                 <action>ChamadoList</action>
             </menuitem>
-            <menuitem label='Lançar Chamados'>
+            <menuitem label='Lançar Chamado'>
                 <icon>fas:plus</icon>
                 <action>ChamadoForm</action>
             </menuitem> 
-            <menuitem label='Mapa de Chamados'>
-                <icon>fas:map</icon>
-                <action>ChamadoMapa</action>
-            </menuitem>
         </menu>
     </menuitem>
 
@@ -111,7 +107,7 @@
             <menuitem label='Lançar Ponto'>
                 <icon>fas:plus</icon>
                 <action>PontoForm</action>
-            </menuitem> 
+            </menuitem>
         </menu>
     </menuitem>
     

@@ -17,7 +17,9 @@ class Ponto extends TRecord
 
         parent::addAttribute('usuario_id');
         parent::addAttribute('data_hora_entrada');
+        parent::addAttribute('data_hora_entrada_2');
         parent::addAttribute('data_hora_saida');
+        parent::addAttribute('data_hora_saida_1');
         parent::addAttribute('latitude');
         parent::addAttribute('longitude');
         parent::addAttribute('tipo');
@@ -26,7 +28,7 @@ class Ponto extends TRecord
     public function get_usuario()
     {
         if (empty($this->usuario))
-            $this->usuario = new SystemUsers($this->usuario_id);
+            $this->usuario = new SystemUser($this->usuario_id);
         return $this->usuario;
     }
 }

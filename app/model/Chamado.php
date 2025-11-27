@@ -20,6 +20,7 @@ class Chamado extends TRecord
         parent::addAttribute('descricao');
         parent::addAttribute('tipo');
         parent::addAttribute('status');
+        parent::addAttribute('solucao');
         parent::addAttribute('usuario_abertura_id');
         parent::addAttribute('responsavel_id');
         parent::addAttribute('data_abertura');

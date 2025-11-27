@@ -1,7 +1,7 @@
 <?php
 /**
  * ChamadoHistorico Active Record
- * Histórico de alterações de status dos chamados
+ * Registra alterações de status e observações dos chamados
  */
 class ChamadoHistorico extends TRecord
 {
@@ -9,8 +9,8 @@ class ChamadoHistorico extends TRecord
     const PRIMARYKEY = 'id';
     const IDPOLICY   = 'serial';
 
-    private $chamado;
     private $usuario;
+    private $chamado;
 
     public function __construct($id = NULL, $callObjectLoad = TRUE)
     {
@@ -23,17 +23,17 @@ class ChamadoHistorico extends TRecord
         parent::addAttribute('observacao');
     }
 
+    public function get_usuario()
+    {
+        if (empty($this->usuario))
+            $this->usuario = new SystemUser($this->usuario_id);
+        return $this->usuario;
+    }
+
     public function get_chamado()
     {
         if (empty($this->chamado))
             $this->chamado = new Chamado($this->chamado_id);
         return $this->chamado;
-    }
-
-    public function get_usuario()
-    {
-        if (empty($this->usuario))
-            $this->usuario = new SystemUsers($this->usuario_id);
-        return $this->usuario;
     }
 }
